@@ -19,13 +19,19 @@ function Tetris(state = GAME_STATES.PAUSED) {
   const events = (keyCode) => {
     const eventsMap = {
       [DOWN]() {
-        getCurrentFigure().moveDown();
+        if (state === GAME_STATES.PLAYING) {
+          getCurrentFigure().moveDown();
+        }
       },
       [RIGHT]() {
-        getCurrentFigure().moveRight();
+        if (state === GAME_STATES.PLAYING) {
+          getCurrentFigure().moveRight();
+        }
       },
       [LEFT]() {
-        getCurrentFigure().moveLeft();
+        if (state === GAME_STATES.PLAYING) {
+          getCurrentFigure().moveLeft();
+        }
       },
       [PAUSE]() {
         if (state === GAME_STATES.PLAYING) {
@@ -42,14 +48,56 @@ function Tetris(state = GAME_STATES.PAUSED) {
   };
 
   const destroyLine = () => {
-    // TODO
+    let cellsArr = [];
+    let ground = new Array(PLAYGROUND_HEIGHT);
+    for (let i = 0; i < PLAYGROUND_HEIGHT; i++) {
+      ground[i] = [0, 0, 0, 0, 0, 0, 0];
+    }
+
+    for(let figure of this.figures) {
+      if (figure.state === STATES.STATIC) {
+        for (let cell of figure.cells) {
+          if (cell.y >= 0) {
+            cellsArr.push(cell);
+            ground[cell.y][cell.x] = 1;
+          }
+          }
+        }
+      }
+
+    let num_full = 0;
+    let full_ind = [];
+    for (let i = 0; i < PLAYGROUND_HEIGHT; i++) {
+      let full = true;
+      for (let el of ground[i]) {
+        if (el === 0) {
+          full = false;
+        }
+      }
+      if (full) {
+        num_full++;
+        full_ind.push(i);
+      }
+    }
+
+    for (let cell of cellsArr) {
+      if (full_ind.includes(cell.y)) {
+        cell.destroy();
+      }
+    }
+
+    for (let cell of cellsArr) {
+      for (let i = 0; i < num_full; i++){
+        cell.moveDown();
+      }
+    }
   };
 
   const checkForGameOver = () => {
     for(let figure of this.figures) {
       if (figure.state === STATES.STATIC) {
         for (let cell of figure.cells) {
-          if (cell.y > PLAYGROUND_HEIGHT) {
+          if (cell.y + 1 > PLAYGROUND_HEIGHT) {
             alert("Game over!");
             state = GAME_STATES.GAMEOVER;
           }
@@ -69,7 +117,7 @@ function Tetris(state = GAME_STATES.PAUSED) {
       if (state === GAME_STATES.PLAYING) {
         checkForGameOver();
         getCurrentFigure().moveDown();
-        destroyLine(); // TODO: not sure where this method shoud be. Maybe in moveDown?
+        destroyLine();
       }
     }, INTERVAL);
   };

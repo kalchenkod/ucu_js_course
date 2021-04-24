@@ -1,7 +1,3 @@
-// x, y - dirrection
-// color - the given color on create
-// figureID - defines the relation on one figure
-// state - will be used in the situation when distruction of cell(s) will free up space for figure movement
 function Cell(x, y, color, figureId, obsticles, state = STATES.FALLING) {
   // Public properties
   this.x = x;
@@ -39,7 +35,7 @@ function Cell(x, y, color, figureId, obsticles, state = STATES.FALLING) {
   this.validFor = (direction) =>
     !hasObsticlesFor(direction) && !willReachBoarders(direction);
 
-  // TODO: deRender and render are identical. it's ossible to refactor.
+  // TODO: deRender and render are identical. it's possible to refactor.
   //       also, this seems to be more of playground class responsibility?
   this.deRender = () =>
     helperMethods.styleCell(this.x, this.y, DEFAULT_COLOR);
@@ -63,7 +59,7 @@ function Cell(x, y, color, figureId, obsticles, state = STATES.FALLING) {
   };
 
   this.destroy = () => {
-    // TODO: make sure this object no longer exists in the memory.
-    //       maybe it will be better to have this kind of function in Figure object
-  }
+    this.deRender()
+    this.state = STATES.DESTROYED;
+  };
 }
